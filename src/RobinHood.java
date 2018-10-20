@@ -1,4 +1,4 @@
-import java.util.Hashtable;
+//import java.util.Hashtable;
 
 public class RobinHood<T extends Comparable<? super T>>{
 
@@ -94,7 +94,7 @@ public class RobinHood<T extends Comparable<? super T>>{
                 table[loc] = new Entry<>(x);
                 size++;
                 if(size == (3 * table.length / 4)){
-                    resize(this);
+                    resize();
                 }
                 return true;
             }
@@ -126,22 +126,23 @@ public class RobinHood<T extends Comparable<? super T>>{
     }
 
 
-    private RobinHood<T> resize(RobinHood<T> IncreasedSize){
-        iniSize *= 2;
-        IncreasedSize.table = new Entry[iniSize];
-        for (int i = 0; i < this.table.length; i++) {
-            if(this.table[i] != null && !this.table[i].isDeleted){
-                IncreasedSize.add(this.table[i].element);
-                System.out.println("U");
-            }
-            else{
-                System.out.println("no");
+    private void/*RobinHood<T>*/ resize(/*RobinHood<T> IncreasedSize*/){
+
+        Entry[] temp = new Entry[iniSize];
+        //Entry[] temp = this.table;
+        for (int j = 0; j < table.length; j++) {
+            if(table[j] != null && !table[j].isDeleted){
+                temp[j] = this.table[j];
             }
         }
-        return IncreasedSize;
+        iniSize *= 2;
+        this.table = new Entry[iniSize];
+        for (int i = 0; i < temp.length; i++) {
+            if(temp[i] != null && !temp[i].isDeleted){
+                this.add((T) temp[i].element);
+            }
+        }
     }
-
-
 
     public static void main(String[] args) {
         RobinHood<Integer> hash = new RobinHood();
@@ -149,6 +150,7 @@ public class RobinHood<T extends Comparable<? super T>>{
         hash.add(120);
         hash.add(121);
         hash.add(122);
+        hash.add(45);
         //hash.add(125);
         //hash.remove(122);
         //hash.add(135);
