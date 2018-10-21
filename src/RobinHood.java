@@ -1,5 +1,5 @@
 //import java.util.Hashtable;
-/*
+
 public class RobinHood<T>{
 
     int size;
@@ -30,7 +30,7 @@ public class RobinHood<T>{
         return h ^ ( h >>> 7) ^ (h >>> 4);
     }
     static int indexFor(int h, int length){
-        return h & (length - 1);
+        return (h & (length - 1));
     }
 
     private int h(T x){
@@ -40,33 +40,38 @@ public class RobinHood<T>{
     public int find(T x){
         int k = 0;
         int i = h(x);
+        boolean flag = false;
         //System.out.println(i);
-        int index;// = (i + k) % table.length;
-        while(true){
+        int index = (i + k) % table.length;
+        while(k <= maxD){
             index = (i + k) % table.length;
             if(table[index] == null) {
                 return index;
             }
-            else if((T) table[index].element == x && !table[index].isDeleted){
+            else if(table[index].element.equals(x) && !table[index].isDeleted){
                 return index;
             }
             else if(table[index].isDeleted){
+                flag = true;
                 break;
             }else{
                 k++;
             }
         }
-        int xSpot = index;
-        while(true){
-            k++;
-            if(table[index].element == x){
-                return index;
-            }
-            if(table[index] == null){
-                return xSpot;
+        if(flag) {
+            int xSpot = index;
+            while (true) {
+                k++;
+                index = (i + k) % table.length;
+                if (table[index] != null && table[index].element.equals(x)) {
+                    return index;
+                }
+                if (table[index] == null) {
+                    return xSpot;
+                }
             }
         }
-        //return index;
+        return index;
     }
 
     public T remove(T x){
@@ -82,7 +87,7 @@ public class RobinHood<T>{
 
     public boolean contains(T x){
         int loc = find(x);
-        if(table[loc] != null && (table[loc].element == x && !table[loc].isDeleted)){
+        if(table[loc] != null && (table[loc].element.equals(x) && !table[loc].isDeleted)){
             return true;
         }
         //System.out.println("weird behaviour of contains");
@@ -106,7 +111,6 @@ public class RobinHood<T>{
                 if(size == ((3 * table.length) / 9)){
                     resize();
                 }
-
                 return true;
             }
             else if(displacement(table[loc].element, loc) >= d){
@@ -120,6 +124,10 @@ public class RobinHood<T>{
 
                 loc = (loc + 1) % table.length;
                 d = displacement(x, loc);
+
+                if(d > maxD) {
+                    maxD = d;
+                }
             }
         }
     }
@@ -147,16 +155,12 @@ public class RobinHood<T>{
     }
 
     private void resize(){
+
+        Entry[] temp = this.table;
+        this.iniSize = iniSize * 2;
+        this.table = new Entry[iniSize];
         size = 0;
         maxD = 0;
-        Entry[] temp = new Entry[iniSize];
-        for (int j = 0; j < table.length; j++) {
-            if(table[j] != null && !table[j].isDeleted){
-                temp[j] = this.table[j];
-            }
-        }
-        iniSize *= 2;
-        this.table = new Entry[iniSize];
         for (int i = 0; i < temp.length; i++) {
             if(temp[i] != null && !temp[i].isDeleted){
                 this.add((T) temp[i].element);
@@ -171,10 +175,8 @@ public class RobinHood<T>{
         hash.printer();
     }
 }
-*/
 
-
-
+/*
 import java.util.Arrays;
 
 public class RobinHood<T> {
@@ -320,4 +322,4 @@ public class RobinHood<T> {
         hash.remove(1);
         hash.printer();
     }
-}
+}*/
