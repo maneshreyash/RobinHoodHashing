@@ -1,10 +1,11 @@
 //import java.util.Hashtable;
-
-public class RobinHood<T extends Comparable<? super T>>{
+/*
+public class RobinHood<T>{
 
     int size;
     Entry<T>[] table;
-    int iniSize = 4;
+    int iniSize;
+    int maxD;
 
     static class Entry<T>{
         T element;
@@ -17,8 +18,11 @@ public class RobinHood<T extends Comparable<? super T>>{
     }
 
     RobinHood(){
-        this.table = new Entry[iniSize];
+
         this.size = 0;
+        this.iniSize = 1024;
+        this.maxD = 0;
+        this.table = new Entry[iniSize];
     }
 
     static int hash(int h){
@@ -37,12 +41,16 @@ public class RobinHood<T extends Comparable<? super T>>{
         int k = 0;
         int i = h(x);
         //System.out.println(i);
-        int index;
+        int index;// = (i + k) % table.length;
         while(true){
             index = (i + k) % table.length;
-            if(table[index] == null || table[index].element == x){
+            if(table[index] == null) {
                 return index;
-            }else if(table[index].isDeleted){
+            }
+            else if((T) table[index].element == x && !table[index].isDeleted){
+                return index;
+            }
+            else if(table[index].isDeleted){
                 break;
             }else{
                 k++;
@@ -58,6 +66,7 @@ public class RobinHood<T extends Comparable<? super T>>{
                 return xSpot;
             }
         }
+        //return index;
     }
 
     public T remove(T x){
@@ -73,10 +82,11 @@ public class RobinHood<T extends Comparable<? super T>>{
 
     public boolean contains(T x){
         int loc = find(x);
-        if(table[loc] == null || table[loc].isDeleted){
-            return false;
+        if(table[loc] != null && (table[loc].element == x && !table[loc].isDeleted)){
+            return true;
         }
-        return true;
+        //System.out.println("weird behaviour of contains");
+        return false;
     }
 
     private int displacement(T x, int loc){
@@ -93,9 +103,10 @@ public class RobinHood<T extends Comparable<? super T>>{
             if(table[loc] == null || table[loc].isDeleted){
                 table[loc] = new Entry<>(x);
                 size++;
-                if(size == (3 * table.length / 4)){
+                if(size == ((3 * table.length) / 9)){
                     resize();
                 }
+
                 return true;
             }
             else if(displacement(table[loc].element, loc) >= d){
@@ -119,17 +130,26 @@ public class RobinHood<T extends Comparable<? super T>>{
         }else{
             for (int i = 0; i < table.length; i++) {
                 if(table[i] != null && !table[i].isDeleted){
-                    System.out.print(table[i].element + "  ");
+                    System.out.print(i + ":" + table[i].element + "  ");
                 }
             }
         }
     }
 
+    static<T> int distinctElements(T[ ] arr){
+        RobinHood<T> dist = new RobinHood<>();
+        for (int i = 0; i < arr.length; i++) {
+            if(arr[i] != null)
+                dist.add(arr[i]);
+        }
+        //dist.printer();
+        return dist.size;
+    }
 
-    private void/*RobinHood<T>*/ resize(/*RobinHood<T> IncreasedSize*/){
-
+    private void resize(){
+        size = 0;
+        maxD = 0;
         Entry[] temp = new Entry[iniSize];
-        //Entry[] temp = this.table;
         for (int j = 0; j < table.length; j++) {
             if(table[j] != null && !table[j].isDeleted){
                 temp[j] = this.table[j];
@@ -145,17 +165,158 @@ public class RobinHood<T extends Comparable<? super T>>{
     }
 
     public static void main(String[] args) {
-        RobinHood<Integer> hash = new RobinHood();
-        hash.add(120);
-        hash.add(120);
-        hash.add(121);
-        hash.add(122);
-        hash.add(45);
-        //hash.add(125);
-        //hash.remove(122);
-        //hash.add(135);
+        RobinHood<Integer> hash = new RobinHood<>();
+        hash.add(129);
+        hash.add(129);
         hash.printer();
-        /*System.out.println(hash.add(120));
-        System.out.println(hash.add(120));*/
+    }
+}
+*/
+
+
+
+import java.util.Arrays;
+
+public class RobinHood<T> {
+    int size = 1024;
+    int elementSize = 0;
+    int maxDisp = 0;
+    Object table[];
+
+    public RobinHood() {
+        table = new Object[size];
+        Arrays.fill(table, null);
+    }
+
+    // This function ensures that hashCodes that differ only by
+    // constant multiples at each bit position have a bounded
+    // number of collisions (approximately 8 at default load factor).
+    // length = table.length is a power of 2
+    static int hash(int h) {
+        h ^= (h >>> 20) ^ (h >>> 12);
+        return h ^ (h >>> 7) ^ (h >>> 4);
+    }
+
+    static int indexFor(int h, int length) {
+        return h & (length - 1);
+    }
+
+    private int h(T x) {
+        return indexFor(hash(x.hashCode()), table.length);
+    }
+
+    private int displace(T x, int loc) {
+        return loc >= h(x) ? loc - h(x) : table.length + loc - h(x);
+    }
+
+    public boolean add(T x) {
+        if (contains(x)) return false;
+        int loc = h(x);
+        int d = 0;
+        while (true) {
+            if (table[loc] == null) {
+                table[loc] = x;
+                elementSize++;
+                if (elementSize > (table.length / 2))
+                    resize();
+                return true;
+            } else if (displace((T) table[loc], loc) >= d) {
+                d = d + 1;
+                maxDisp = Math.max(maxDisp, d);
+                loc = (loc + 1) % table.length;
+            } else {
+                T temp = (T) table[loc];
+                table[loc] = x;
+                x = temp;
+                loc = (loc + 1) % table.length;
+                d = displace(x, loc);
+            }
+        }
+    }
+
+    public T remove(T x) {
+        int index = find(x);
+        if (table[index] == x) {
+            T temp = (T) table[index];
+            table[index] = null;
+            elementSize--;
+            return temp;
+        }
+        return null;
+    }
+
+    private void resize() {
+        Object[] tempArr = new Object[size];
+        for (int j = 0; j < table.length; j++)
+            tempArr[j] = this.table[j];
+
+        size *= 2;
+        this.table = new Object[size];
+        Arrays.fill(table, null);
+        elementSize = 0;
+        for (int i = 0; i < tempArr.length; i++) {
+            if (tempArr[i] != null)
+                this.add((T) tempArr[i]);
+        }
+    }
+
+
+    private int find(T x) {
+        int index = h(x);
+        for (int k = 0; k <= maxDisp; k++) {
+            int nextIndex = index + k;
+            nextIndex = nextIndex % table.length;
+            if (table[nextIndex] == null || table[nextIndex].equals(x)) {
+                return nextIndex;
+            }
+        }
+        return index;
+    }
+
+    public boolean contains(T x) {
+        int index = find(x);
+        if (table[index] != null && table[index].equals(x))
+            return true;
+        return false;
+    }
+
+    public void printer() {
+        if (elementSize == 0)
+            System.out.println("HashTable is empty");
+        else {
+            for (int i = 0; i < table.length; i++) {
+                if (table[i] != null)
+                    System.out.print(i + ":" + table[i] + "  ");
+
+            }
+        }
+        System.out.println();
+        System.out.println("distinct = " + elementSize);
+    }
+
+    static <T> int distinctElements(T[] arr) {
+        RobinHood<T> dist = new RobinHood<>();
+        boolean flag = false;
+        int c = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != null)
+                flag = dist.add(arr[i]);
+                if(flag)
+                    c++;
+        }
+        System.out.println(c);
+        //dist.printer();
+        return dist.elementSize;
+    }
+
+
+    public static void main(String[] args) {
+        RobinHood<Integer> hash = new RobinHood<>();
+        hash.add(2);
+        hash.add(3);
+        hash.add(4);
+        hash.remove(4);
+        hash.remove(1);
+        hash.printer();
     }
 }
