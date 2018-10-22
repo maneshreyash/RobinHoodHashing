@@ -1,3 +1,4 @@
+package ssm170730;
 
 /** Timer class for roughly calculating running time of programs
  *  @author rbk

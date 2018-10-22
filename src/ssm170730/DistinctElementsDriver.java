@@ -1,3 +1,5 @@
+package ssm170730;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
@@ -8,7 +10,7 @@ public class DistinctElementsDriver {
 
         Random rand = new Random();
         int rand_int;
-        Integer[] arr = new Integer[Integer.MAX_VALUE / 100];
+        Integer[] arr = new Integer[10000000];
 
         for (int i = 0; i < arr.length; i++) {
             rand_int = rand.nextInt();
@@ -22,15 +24,14 @@ public class DistinctElementsDriver {
 
         System.out.println();
 
-        Timer timerset = new Timer();
-        HashSet<Integer> hashset = new HashSet<>();
-        hashset.addAll(Arrays.asList(arr));
+        Timer timerSet = new Timer();
+        HashSet<Integer> hashSet = new HashSet<>(Arrays.asList(arr));
 
-        int dist = hashset.size();
+        int dist = hashSet.size();
 
-        timerset.end();
+        timerSet.end();
         System.out.println("Distinct Elements in HashSet: " + dist);
-        System.out.println(timerset);
+        System.out.println(timerSet);
 
     }
 }
