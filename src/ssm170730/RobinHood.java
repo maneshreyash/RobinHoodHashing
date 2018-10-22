@@ -1,5 +1,9 @@
 package ssm170730;
 
+/**
+ * This class creates a RobinHood hashing technique which will use the techniques of probing to improve hash clash resolution.
+ * @param <T>
+ */
 public class RobinHood<T>{
 
     private int size;
@@ -7,16 +11,27 @@ public class RobinHood<T>{
     private int iniSize;
     private int maxD;
 
+    /**
+     * Every element in the HashTable will be created using an Entry class.
+     * @param <T>: The element to be entered.
+     */
     static class Entry<T>{
         T element;
         boolean isDeleted;
 
+        /**
+         * Constructor for Entry class;
+         * @param x: Element to be stored in the Table.
+         */
         private Entry(T x){
             this.element = x;
             this.isDeleted = false;
         }
     }
 
+    /**
+     * Constructor for RobinHood Hash Table.
+     */
     RobinHood(){
 
         this.size = 0;
@@ -25,10 +40,22 @@ public class RobinHood<T>{
         this.table = new Entry[iniSize];
     }
 
+    /**
+     *
+     * @param h: hashcode() of x.
+     * @return: gives the hash key for x.
+     */
     private static int hash(int h){
         h ^= (h >>> 20) ^ (h >>> 12);
         return h ^ ( h >>> 7) ^ (h >>> 4);
     }
+
+    /**
+     *
+     * @param h: hash key from hash().
+     * @param length: length of the Entry array which will hold elements for the table.
+     * @return: gives the index where x can be added in the table Entry array.
+     */
     private static int indexFor(int h, int length){
         return (h & (length - 1));
     }
@@ -37,6 +64,10 @@ public class RobinHood<T>{
         return indexFor(hash(x.hashCode()), table.length);
     }
 
+    /**
+     * @param x: Element x to be found in the HashTable.
+     * @return: gives the index where x could be added or might have been.
+     */
     private int find(T x){
         int k = 0;
         int index = 0;
@@ -69,10 +100,19 @@ public class RobinHood<T>{
         return index;
     }
 
+    /**
+     *
+     * @return: gives the number of elements in the HashTable.
+     */
     public int getSize(){
         return this.size;
     }
 
+    /**
+     *
+     * @param x: Element x to be removed from the HashTable.
+     * @return: gives the element that was removed, else returns null if element was not added earlier or was deleted previously.
+     */
     public T remove(T x){
         int index = find(x);
         if(table[index] != null && table[index].element.equals(x) && !table[index].isDeleted){
@@ -84,15 +124,31 @@ public class RobinHood<T>{
         return null;
     }
 
+    /**
+     *
+     * @param x: Element x to be checked for containment.
+     * @return: gives true if element is present in the HashTable or returns false if element is absent.
+     */
     public boolean contains(T x){
         int loc = find(x);
         return table[loc] != null && (table[loc].element.equals(x) && !table[loc].isDeleted);
     }
 
+    /**
+     * Finds how far the element is from its designated index.
+     * @param x: Element that is displaced.
+     * @param loc: hashed location of x.
+     * @return: displacement of x from hashed index.
+     */
     private int displacement(T x, int loc){
         return loc >= h(x) ? (loc - h(x)) : (table.length + (loc - h(x)));
     }
 
+    /**
+     *
+     * @param x: Element to be added.
+     * @return: True if add was successful else false.
+     */
     public boolean add(T x){
         if(contains(x)){
             return false;
@@ -142,6 +198,11 @@ public class RobinHood<T>{
         }
     }*/
 
+    /**
+     * Calculate distinct elements in an array
+     * @param arr: Array of Integers which may or may not have duplicates.
+     * @return: returns the count of distinct elements in the provided array.
+     */
     static<T> int distinctElements(T[ ] arr){
         RobinHood<T> dist = new RobinHood<>();
         for (T i: arr){
@@ -151,6 +212,9 @@ public class RobinHood<T>{
         return dist.getSize();
     }
 
+    /**
+     * To increase the size of the table in case there are a lot of additions to reduce the number of probes.
+     */
     private void resize(){
 
         Entry[] temp = this.table;
