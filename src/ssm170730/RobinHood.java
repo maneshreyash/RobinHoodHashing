@@ -1,3 +1,17 @@
+/** SP - 47
+ *  *
+ *   Implementation of data structures and algorithms
+ * Fall 2018
+ * Short Project 7: Hashing
+
+ *
+ *  Team Members:
+ * Shreyash Mane - ssm170730
+ * Shruti Jaiswal - sxj170027
+ */
+
+
+
 package ssm170730;
 
 /**
